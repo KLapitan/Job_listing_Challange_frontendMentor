@@ -1,8 +1,68 @@
-import { useEffect, useState } from "react"
+import { useEffect,  useState } from "react"
+import List from "./List"
+import FilterList from "./filterList"
 
 const JobListing = () => {
 
 const [jobList,setJobList]=useState([])
+
+// single filter
+// const [selectedFilter ,setSelectedFilter]=useState(null)
+
+// multipleActiveFilter
+
+const [activeFilterItems,setActiveFilterItems ]=useState([])
+
+
+
+const [showList,setShowList]=useState(false)
+
+
+
+
+
+
+const handleAddFilterItems= (item) => {
+  console.log("Clicked tag:", item, typeof item);
+setActiveFilterItems((prev) => {
+// advoid duplication
+if(!prev.includes(item)) return [...prev,item];
+
+return prev
+}
+)
+
+
+
+setShowList(true)
+
+}
+
+
+
+
+
+useEffect(() => {
+  console.log("Active filters updated:", activeFilterItems);
+}, [activeFilterItems]);
+
+
+const handleDeleteFilterItems =(item)=> {
+
+const deleteItem = activeFilterItems.filter(i => i !== item)
+setActiveFilterItems(deleteItem)
+
+console.log(activeFilterItems)
+}
+
+
+// todo filtered 
+
+
+const filteredRoles = activeFilterItems.length === 0 ? jobList :jobList.filter((job) => 
+activeFilterItems.some(item => item === job.role || item === job.level))
+
+
 
 
 
@@ -29,69 +89,41 @@ fetchJobList()
 },[])
 
 
-// const filtereditems = (itemName) => {
-// const selectedRole = jobList.filter((item) => item.role === itemName || item.level === itemName || item.tool === itemName)
 
 
-// }
+
+
 
 
 return(
-<section>
+<section className="relative">
+
+<div className="absolute bg-white w-auto -top-20 h-20 ">
+<ul className="flex flex-row gap-2 flex-wrap w-auto">
+{activeFilterItems?.map((item,index) => (
+<li key={index} className="border flex flex-row items-center h-8">{item}<button className="border h-8 w-6" onClick={() => handleDeleteFilterItems(item)}>x</button> </li>
+))}
+</ul>
 
 
 
-<ul className="flex flex-col gap-13 pt-10 p-3 w-auto items-center">
 
 
-{jobList.map((job) => (
-<li key={job.id} className="flex flex-col lg:flex-row  border-l-8 rounded-lg bg-white shadow-lg shadow-PGreen-400/30 justify-between items-center h-64 border-l-PGreen-400 lg:w-5xl lg:h-40  ">
-
-<section className="flex flex-col lg:flex-row border gap-2  lg:gap-3  justify-items-start   w-full  p-3">
-<img src={job.logo} className="-mt-10 lg:mt-0 w-13 h-13   lg:w-20 lg:h-20"/>
-
-<div className="flex flex-col  gap-2 ">
-
-<span className="text-PGreen-400 font-League-Spartan text-md font-bold">{job.company}</span>
-<span className="text-NGreen-900 font-League-Spartan font-bold">{job.position}</span>
-
-<span className="flex flex-row  gap-3 text-NGray-400 font-League-Spartan"> 
-<p>{job.postedAt} </p>
-<p>{job.contract}</p>
-<p>{job.location}</p>
-</span>
 </div>
 
-{/* border gap */}
-<div className="border-b w-full border-b-NGray-400  lg:hidden"></div>
 
-</section>
+<ul className="flex flex-col gap-13 pt-10 p-3 min-w-auto items-center">
 
-{/* langauges,tools,role,level */}
-<div className=" w-full   mb-4 p-2 font-League-Spartan text-md font-bold -mt-3">
-<span className="flex  flex-row gap-3  lg:gap-5 border flex-wrap lg:flex-nowrap w-full  lg:justify-end">
-<p className="bg-NGreen-50 text-PGreen-400 px-3 py-1 cursor-pointer active:bg-NGreen-900 active:text-PGreen-400 "> {job?.role}</p>
-
-<p className="bg-NGreen-50 text-PGreen-400 px-3 py-1  cursor-pointer active:bg-NGreen-900 active:text-PGreen-400">
-{job?.level}
-</p>
-{job?.languages.map((language) => (
-<p className="bg-NGreen-50 text-PGreen-400 px-3 py-1 cursor-pointer active:bg-NGreen-900 active:text-PGreen-400">{language}</p>
-))}
-
-{job?.tools.map((tool) => (
-<p className="bg-NGreen-50 text-PGreen-400 px-3 py-1 cursor-pointer active:bg-NGreen-900 active:text-PGreen-400 ">{tool}</p>
-))}
+  {showList ? 
+(<FilterList filterRoles={filteredRoles}/>) : (
 
 
-</span>
-</div>
-
-</li>
-))}
+<List jobList={jobList}  onHandleItem={handleAddFilterItems} />
+)}  
 
 
 </ul>
+
 
 
 </section>
